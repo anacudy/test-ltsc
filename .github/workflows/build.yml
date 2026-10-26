@@ -17,11 +17,18 @@ jobs:
     runs-on: windows-2025
 
     steps:
-      - name: Check UUID
-        id: check_uuid
+      - name: Check Version and UUID
+        id: version_uuid
         env:
+          LTSC_VERSION: ${{ inputs.ltsc_version }}
           UPDATE_UUID: ${{ inputs.update_uuid }}
         run: |
+          $version = $env:LTSC_VERSION.Trim()
+          if ($version -notin '2021', '2024') {
+            throw "Invalid version: $version"
+          }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$version" -Encoding ascii
+
           $uuid = $env:UPDATE_UUID.Trim()
           if ($null -eq ($uuid -as [guid])) {
             throw "Invalid UUID: $uuid"
@@ -44,7 +51,10 @@ jobs:
           repository: abbodi1406/BatUtil
           path: BatUtil
 
-      - name: Download
+      - name: Download ISO and Update
         run: |
+          aria2c --quiet=true --conf-path=aria2.conf --input-file=${{ steps.version_uuid.outputs.version }}.txt
+          aria2c --quiet=true --conf-path=aria2.conf "https://uupdump.net/get.php?id=${{ steps.version_uuid.outputs.uuid }}&pack=0&edition=updateOnly&aria2=2"
 
-          aria2c --quiet=true --input-file=2024.txt --conf-path=aria2.conf
+      - name: ls
+        run: ls
