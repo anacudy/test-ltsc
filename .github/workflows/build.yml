@@ -20,7 +20,7 @@ jobs:
       - name: Check UUID
         id: check_uuid
         run: |
-          $uuid = ${{ inputs.update_uuid }}.Trim()
+          $uuid = '${{ inputs.update_uuid }}'.Trim()
           if ($null -eq ($uuid -as [guid])) {
             throw "Invalid UUID: $uuid"
           }
