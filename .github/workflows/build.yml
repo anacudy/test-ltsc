@@ -1,0 +1,65 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2025
+
+    # permissions:
+    #   contents: write
+
+    steps:
+      - name: Checkout Mine
+        uses: actions/checkout@v7
+
+      - name: Checkout W10UI
+        uses: actions/checkout@v7
+        with:
+          repository: abbodi1406/BatUtil
+          path: BatUtil
+
+      - name: Download
+        run: aria2c --quiet=true --input-file=url.txt --conf-path=aria2.conf
+
+      # - name: Prepare
+      #   run: |
+      #     mkdir driver
+      #     mkdir driver/gfx
+      #     sudo apt-get -qq update
+      #     sudo apt-get -qq install -y msitools
+
+      # - name: Chipset
+      #   run: |
+      #     7z x -t# chipset.exe -ochipset *ChipsetInstaller.exe
+      #     7z x -t# chipset/$(ls chipset | head -n 1) -ochipset *.zip
+      #     unzip -d chipset chipset/*.zip || [[ $? -eq 1 ]]
+      #     mv chipset/Drivers driver/chipset
+
+      # - name: Graphics
+      #   run: |
+      #     7z x 07th-10th.exe -o07th-10th
+      #     7z x 11th-14th.exe -o11th-14th
+      #     mv 07th-10th/Graphics driver/gfx/07th-10th
+      #     mv 11th-14th/Graphics driver/gfx/11th-14th
+
+      # - name: Wireless
+      #   run: |
+      #     7z x wifi.cab -owifi
+      #     mv wifi driver/wifi
+
+      # - name: Bluetooth
+      #   run: |
+      #     7z x -t# bt.exe -obt *.msi
+      #     msiextract -C bt bt/*.msi
+      #     mv 'bt/Program Files/Intel/Bluetooth/drivers' driver/bt
+
+      # - name: Compress
+      #   run: 7z a -t7z -mx=9 -m0=lzma2 -md=256m -mfb=273 -ms=on driver.7z driver
+
+      # - name: Release
+      #   uses: softprops/action-gh-release@v3
+      #   with:
+      #     tag_name: latest
+      #     files: driver.7z
+      #     overwrite_files: true
+      #     fail_on_unmatched_files: true
